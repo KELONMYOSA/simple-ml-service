@@ -1,6 +1,5 @@
+from backend.src.contracts import Token, UserReg
 from fastapi import APIRouter
-
-from backend.src.contracts import UserReg, Token
 
 router = APIRouter(
     prefix="/auth",
