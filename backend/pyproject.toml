@@ -1,0 +1,79 @@
+[tool.poetry]
+name = "simple-ml-service-backend"
+version = "0.1.0"
+description = "Backend"
+authors = ["Vladislav Samoilenko <79825223592@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+uvicorn = "^0.26.0"
+fastapi = "^0.109.0"
+pydantic-settings = "^2.1.0"
+celery = "^5.3.6"
+redis = "^5.0.1"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.13"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle
+    "W",  # pycodestyle
+    "F",  # Pyflakes
+    "B",  # flake8-bugbear
+    "Q",  # flake8-quotes
+    "I", # isort
+    #  "G",  # flake8-logging-format
+    "UP",  # pyupgrade
+    "PL",  # pylint
+    "C4",  # comprehensions
+    "T10",  # flake8-debugger
+    "SIM",  # flake8-simplify
+    "INT",  # flake8-gettext
+    "PIE",  # misc lints
+    "PYI",  # flake8-pyi
+    "TID",  # tidy imports
+    "TCH",  # type-checking imports
+    "ISC",  # implicit string concatenation
+    "PGH",  # pygrep-hooks
+    "RUF",  # Ruff-specific rules
+]
+ignore = [
+    "RUF001",  # cyrillyc symbols in f-string
+    "RUF002",  # cyrillyc symbols in docstring
+    "RUF003",  # cyrillyc symbols in comment
+    "PLR0913",  # to many arguments (>5) in function defenition
+    "ISC001",  # checks for implicitly concatenated strings on a single line.
+]
