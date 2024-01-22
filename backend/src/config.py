@@ -6,6 +6,9 @@ class Settings(BaseSettings):
 
     RMQ_URL: str
     REDIS_URL: str
+    DB_URL: str
+    SECRET_KEY: str
+    REFRESH_SECRET_KEY: str
 
 
 settings = Settings()

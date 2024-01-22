@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.routers import auth
+from src.routers import auth, balance
 
 # Creating additional metadata for the tags used to group path operations
 tags_metadata = [
@@ -34,6 +34,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth.router)
+app.include_router(balance.router)
 
 # Start the uvicorn ASGI server with the specified parameters
 if __name__ == "__main__":

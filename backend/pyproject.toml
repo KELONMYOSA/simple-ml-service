@@ -12,6 +12,13 @@ fastapi = "^0.109.0"
 pydantic-settings = "^2.1.0"
 celery = "^5.3.6"
 redis = "^5.0.1"
+sqlalchemy = "^2.0.25"
+passlib = "^1.7.4"
+python-jose = "^3.3.0"
+psycopg2-binary = "^2.9.9"
+python-multipart = "^0.0.6"
+pydantic = {extras = ["email"], version = "^2.5.3"}
+bcrypt = "4.0.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.13"

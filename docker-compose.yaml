@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  postgresqldb:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DATABASE}
+    volumes:
+      - pg_db_data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - ml-service-net
+
+volumes:
+  pg_db_data:
+
+networks:
+  ml-service-net:
+    driver: bridge
