@@ -47,7 +47,7 @@ def create_tokens(data: dict) -> tuple[str, str]:
 
 
 # Получение текущего пользователя из токена
-def get_current_user(token: str = Depends(oauth2_scheme), refresh: bool = False) -> User | None:
+def get_current_user(token: str = Depends(oauth2_scheme)) -> User | None:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -55,10 +55,30 @@ def get_current_user(token: str = Depends(oauth2_scheme), refresh: bool = False)
     )
 
     try:
-        if refresh:
-            payload = jwt.decode(token, REFRESH_SECRET_KEY, algorithms=[ALGORITHM])
-        else:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    user = get_user_by_email(email)
+    if user is None:
+        raise credentials_exception
+
+    return user
+
+
+# Получение текущего пользователя из Refresh Токена
+def get_current_user_refresh(token: str = Depends(oauth2_scheme)) -> User | None:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = jwt.decode(token, REFRESH_SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("sub")
         if email is None:
             raise credentials_exception

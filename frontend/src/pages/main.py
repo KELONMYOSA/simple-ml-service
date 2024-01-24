@@ -1,20 +1,19 @@
 import flet
 
+from src.pages import dashboard
+
 
 async def main(page: flet.Page):
     page.title = "KELONMYOSA"
     page.horizontal_alignment = flet.CrossAxisAlignment.CENTER
     page.scroll = flet.ScrollMode.AUTO
 
-    main_page_controls = [
-        flet.Container(
-            content=flet.Text(
-                value="KELONMYOSA", style=flet.TextThemeStyle.HEADLINE_MEDIUM, color=flet.colors.BLUE_600
-            ),
-            alignment=flet.alignment.center,
-            height=80,
-        ),
-    ]
-    view = flet.Column(width=page.width * 0.6, controls=main_page_controls)
+    page.appbar = flet.AppBar(
+        leading=flet.Icon(flet.icons.COMPUTER),
+        leading_width=30,
+        title=flet.Text("ML DEV - KELONMYOSA"),
+        center_title=False,
+        bgcolor=flet.colors.SURFACE_VARIANT,
+    )
 
-    await page.add_async(view)
+    await dashboard.main(page)

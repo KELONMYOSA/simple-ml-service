@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.11"
 flet = "^0.19.0"
 pydantic-settings = "^2.1.0"
+aiohttp = "^3.9.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.13"

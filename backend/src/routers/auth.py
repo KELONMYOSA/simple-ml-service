@@ -1,8 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from src.contracts import UserCreate
-from src.utils.auth import authenticate_user, create_tokens, get_current_user, get_user_by_email, register_user
+from src.contracts import User, UserCreate
+from src.utils.auth import (
+    authenticate_user,
+    create_tokens,
+    get_current_user,
+    get_current_user_refresh,
+    get_user_by_email,
+    register_user,
+)
 
 router = APIRouter(
     prefix="/auth",
@@ -35,7 +42,13 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 # Обновление токена с использованием Refresh Token
 @router.post("/refresh")
 def refresh(token: str):
-    user = get_current_user(token, refresh=True)
+    user = get_current_user_refresh(token)
     access_token, refresh_token = create_tokens({"sub": user.email})
 
     return {"access_token": access_token, "token_type": "bearer", "refresh_token": refresh_token}
+
+
+# Обновление токена с использованием Refresh Token
+@router.get("/info")
+def user_info(current_user: User = Depends(get_current_user)):
+    return {"id": current_user.id, "email": current_user.email}
