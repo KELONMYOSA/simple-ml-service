@@ -33,7 +33,11 @@ async def get_user_info(page: flet.Page) -> dict | None:
                 return await resp.json()
 
         await refresh_token(page)
+        token = await page.client_storage.get_async("access_token")
+        if not token:
+            return None
 
+        headers = {"Authorization": f"bearer {token}"}
         async with session.get(url, headers=headers) as resp:
             if resp.status == 200:
                 return await resp.json()

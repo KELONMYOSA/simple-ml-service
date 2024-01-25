@@ -1,18 +1,24 @@
 import flet
 
-from src.pages import login
+from src.pages import deposit, login
 from src.utils.auth import get_user_info, logout
+from src.utils.balance import get_user_balance
 
 
 async def main(page: flet.Page):
     user = await get_user_info(page)
+    balance = await get_user_balance(page)
     if user:
         page.appbar.actions = [
             flet.Row(
                 controls=[
+                    flet.TextButton(
+                        text=f"{balance} cu",
+                        icon=flet.icons.ACCOUNT_BALANCE_WALLET,
+                        on_click=to_deposit,
+                    ),
                     flet.Text(
                         value=user["email"],
-                        color=flet.colors.BLUE_600,
                         style=flet.TextThemeStyle.BODY_LARGE,
                     ),
                     flet.IconButton(icon=flet.icons.LOGOUT, tooltip="Logout", on_click=logout),
@@ -39,3 +45,8 @@ async def main(page: flet.Page):
             width=page.width * 0.6,
         )
     )
+
+
+async def to_deposit(e: flet.ControlEvent):
+    page = e.page
+    await deposit.main(page)
