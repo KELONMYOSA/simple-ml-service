@@ -41,8 +41,6 @@ services:
       dockerfile: DockerfileFastapi
     image: fastapi-backend
     container_name: fastapi
-    ports:
-      - "8080:8080"
     depends_on:
       - rabbitmq
       - redis

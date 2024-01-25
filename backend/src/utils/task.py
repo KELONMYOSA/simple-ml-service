@@ -11,8 +11,8 @@ from src.utils.celery_config import celery_app, get_task_result
 
 
 def get_model_by_id(model_id: int) -> Model:
-    db = get_db()
-    model = db.query(Model).filter(Model.id == model_id).first()
+    with get_db() as db:
+        model = db.query(Model).filter(Model.id == model_id).first()
     if model is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Model not found")
 
@@ -20,8 +20,8 @@ def get_model_by_id(model_id: int) -> Model:
 
 
 def get_all_models() -> list[Model]:
-    db = get_db()
-    return db.query(Model).all()
+    with get_db() as db:
+        return db.query(Model).all()
 
 
 def _send_task_to_celery(model_id: int, input_data: InputData) -> str:
@@ -39,38 +39,38 @@ def _send_task_to_celery(model_id: int, input_data: InputData) -> str:
 
 def _create_celery_task(model_id: int, input_data: InputData) -> int:
     celery_task = _send_task_to_celery(model_id, input_data)
-    db = get_db()
-    task = CeleryTask(
-        celery_task=celery_task, model_id=model_id, input_data=input_data.model_dump(), task_result="In Progress"
-    )
-    db.add(task)
-    db.commit()
-    db.refresh(task)
-    return task.id
+    with get_db() as db:
+        task = CeleryTask(
+            celery_task=celery_task, model_id=model_id, input_data=input_data.model_dump(), task_result="In Progress"
+        )
+        db.add(task)
+        db.commit()
+        db.refresh(task)
+        return task.id
 
 
 def _set_user_to_task(user_id: int, celery_task_id: int):
-    db = get_db()
-    task = UserTask(user_id=user_id, task_id=celery_task_id)
-    db.add(task)
-    db.commit()
+    with get_db() as db:
+        task = UserTask(user_id=user_id, task_id=celery_task_id)
+        db.add(task)
+        db.commit()
 
 
 def _get_task_info_by_id(task_id: int) -> TaskInfo:
-    db = get_db()
-    task = db.query(CeleryTask).filter(CeleryTask.id == task_id).first()
-    model = task.model
+    with get_db() as db:
+        task = db.query(CeleryTask).filter(CeleryTask.id == task_id).first()
+        model = task.model
 
-    task_info = TaskInfo(
-        id=task.id,
-        model_name=model.name,
-        cost=model.cost,
-        input_data=task.input_data,
-        prediction=task.prediction,
-        task_result=task.task_result,
-    )
+        task_info = TaskInfo(
+            id=task.id,
+            model_name=model.name,
+            cost=model.cost,
+            input_data=task.input_data,
+            prediction=task.prediction,
+            task_result=task.task_result,
+        )
 
-    return task_info
+        return task_info
 
 
 def create_new_task(task_data: TaskCreate, current_user: User) -> TaskInfo:
@@ -87,42 +87,42 @@ def create_new_task(task_data: TaskCreate, current_user: User) -> TaskInfo:
 
 
 def _update_in_progress_tasks(current_user: User):
-    db = get_db()
-    in_progress_tasks = (
-        db.query(CeleryTask)
-        .join(UserTask)
-        .filter(CeleryTask.task_result == "In Progress", UserTask.user_id == current_user.id)
-        .all()
-    )
+    with get_db() as db:
+        in_progress_tasks = (
+            db.query(CeleryTask)
+            .join(UserTask)
+            .filter(CeleryTask.task_result == "In Progress", UserTask.user_id == current_user.id)
+            .all()
+        )
 
-    for task in in_progress_tasks:
-        task_status = get_task_result(task.celery_task)
-        if task_status["status"] == "SUCCESS":
-            task.prediction = bool(task_status["result"]["score"])
-            task.task_result = "Done"
-        elif task_status["status"] == "FAILURE":
-            task.task_result = "Error"
-            make_deposit(current_user, task.model.cost)
-    db.commit()
+        for task in in_progress_tasks:
+            task_status = get_task_result(task.celery_task)
+            if task_status["status"] == "SUCCESS":
+                task.prediction = bool(task_status["result"]["score"])
+                task.task_result = "Done"
+            elif task_status["status"] == "FAILURE":
+                task.task_result = "Error"
+                make_deposit(current_user, task.model.cost)
+        db.commit()
 
 
 def get_user_tasks(current_user: User) -> list[TaskInfo]:
     _update_in_progress_tasks(current_user)
-    db = get_db()
-    user_tasks = db.query(UserTask).filter(UserTask.user_id == current_user.id).all()
-    results = []
+    with get_db() as db:
+        user_tasks = db.query(UserTask).filter(UserTask.user_id == current_user.id).all()
+        results = []
 
-    for user_task in user_tasks:
-        task = user_task.tasks
-        model = task.model
-        task_info = TaskInfo(
-            id=task.id,
-            model_name=model.name,
-            cost=model.cost,
-            input_data=task.input_data,
-            prediction=task.prediction,
-            task_result=task.task_result,
-        )
-        results.append(task_info)
+        for user_task in user_tasks:
+            task = user_task.tasks
+            model = task.model
+            task_info = TaskInfo(
+                id=task.id,
+                model_name=model.name,
+                cost=model.cost,
+                input_data=task.input_data,
+                prediction=task.prediction,
+                task_result=task.task_result,
+            )
+            results.append(task_info)
 
-    return results
+        return results

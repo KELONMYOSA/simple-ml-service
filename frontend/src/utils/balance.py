@@ -44,3 +44,17 @@ async def make_deposit(page: flet.Page, amount: float) -> dict:
                 return {"result": True}
             else:
                 return {"result": False, "message": data["detail"]}
+
+
+async def do_withdraw(page: flet.Page, amount: float) -> dict:
+    async with aiohttp.ClientSession() as session:
+        url = settings.FASTAPI_URL + "/balance/withdraw"
+        token = await page.client_storage.get_async("access_token")
+        headers = {"Authorization": f"bearer {token}"}
+        body = {"amount": amount}
+        async with session.post(url, params=body, headers=headers) as resp:
+            data = await resp.json()
+            if resp.status == 200:
+                return {"result": True}
+            else:
+                return {"result": False, "message": data["detail"]}

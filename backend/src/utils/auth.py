@@ -98,24 +98,24 @@ def register_user(email: str, password: str) -> User:
     # Создаем нового пользователя
     hashed_password = pwd_context.hash(password)
     db_user = User(email=email, password=hashed_password)
-    db = get_db()
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    with get_db() as db:
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
 
-    # Инициализируем баланс для нового пользователя
-    db_user_balance = UserBalance(user_id=db_user.id, balance=0.0)
-    db.add(db_user_balance)
-    db.commit()
-    db.refresh(db_user)
+        # Инициализируем баланс для нового пользователя
+        db_user_balance = UserBalance(user_id=db_user.id, balance=0.0)
+        db.add(db_user_balance)
+        db.commit()
+        db.refresh(db_user)
 
     return db_user
 
 
 # Получение пользователя по email
 def get_user_by_email(email: str) -> User | None:
-    db = get_db()
-    return db.query(User).filter(User.email == email).first()
+    with get_db() as db:
+        return db.query(User).filter(User.email == email).first()
 
 
 # Аутентификация пользователя
