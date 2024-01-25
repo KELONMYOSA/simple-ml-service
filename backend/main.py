@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.database.db import init_db
 from src.routers import auth, balance
 
 # Creating additional metadata for the tags used to group path operations
@@ -9,7 +10,11 @@ tags_metadata = [
     {
         "name": "Authorization",
         "description": "Operations with user authorization",
-    }
+    },
+    {
+        "name": "Account balance",
+        "description": "Operations with user balance",
+    },
 ]
 
 # Creating an "instance" of the class FastAPI
@@ -31,6 +36,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Database initialization
+init_db()
 
 # Include routers
 app.include_router(auth.router)

@@ -7,6 +7,7 @@ from passlib.context import CryptContext
 
 from src.config import settings
 from src.database.db import get_db
+from src.database.models.balance import UserBalance
 from src.database.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
@@ -94,12 +95,20 @@ def get_current_user_refresh(token: str = Depends(oauth2_scheme)) -> User | None
 
 # Регистрация пользователя
 def register_user(email: str, password: str) -> User:
+    # Создаем нового пользователя
     hashed_password = pwd_context.hash(password)
     db_user = User(email=email, password=hashed_password)
     db = get_db()
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+
+    # Инициализируем баланс для нового пользователя
+    db_user_balance = UserBalance(user_id=db_user.id, balance=0.0)
+    db.add(db_user_balance)
+    db.commit()
+    db.refresh(db_user)
+
     return db_user
 
 

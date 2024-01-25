@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from src.contracts import User, UserCreate
+from src.contracts import UserCreate
+from src.database.models.user import User
 from src.utils.auth import (
     authenticate_user,
     create_tokens,

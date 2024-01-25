@@ -31,7 +31,3 @@ class UserCreate(BaseModel):
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Password must contain at least one digit"
             )
         return value
-
-
-class User(UserCreate):
-    id: int
