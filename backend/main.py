@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.database.db import init_db
-from src.routers import auth, balance
+from src.routers import auth, balance, task
 
 # Creating additional metadata for the tags used to group path operations
 tags_metadata = [
@@ -14,6 +14,10 @@ tags_metadata = [
     {
         "name": "Account balance",
         "description": "Operations with user balance",
+    },
+    {
+        "name": "Celery tasks",
+        "description": "Operations with Celery and ML models",
     },
 ]
 
@@ -43,6 +47,7 @@ init_db()
 # Include routers
 app.include_router(auth.router)
 app.include_router(balance.router)
+app.include_router(task.router)
 
 # Start the uvicorn ASGI server with the specified parameters
 if __name__ == "__main__":

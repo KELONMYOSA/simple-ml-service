@@ -12,3 +12,4 @@ class User(Base):
     password = Column(String, nullable=False)
 
     balance = relationship("UserBalance", back_populates="user")
+    tasks = relationship("UserTask", back_populates="user")

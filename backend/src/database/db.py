@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from src.config import settings
 from src.database.base import Base
@@ -11,13 +11,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def init_db():
-    from src.database.models.balance import UserBalance
-    from src.database.models.user import User
-
     Base.metadata.create_all(bind=engine)
-
-    User.balance = relationship("UserBalance", back_populates="user")
-    UserBalance.user = relationship("User", back_populates="balance")
 
 
 def get_db():

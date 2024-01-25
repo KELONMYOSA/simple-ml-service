@@ -31,3 +31,35 @@ class UserCreate(BaseModel):
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Password must contain at least one digit"
             )
         return value
+
+
+class InputData(BaseModel):
+    temperature: float
+    humidity: float
+    CO2CosIRValue: float
+    CO2MG811Value: float
+    MOX1: float
+    MOX2: float
+    MOX3: float
+    MOX4: float
+    COValue: float
+
+
+class TaskCreate(BaseModel):
+    model_id: int
+    input_data: InputData
+
+
+class ModelResponse(BaseModel):
+    id: int
+    name: str
+    cost: float
+
+
+class TaskInfo(BaseModel):
+    id: int
+    model_name: str
+    cost: float
+    input_data: InputData
+    prediction: bool | None
+    task_result: str
